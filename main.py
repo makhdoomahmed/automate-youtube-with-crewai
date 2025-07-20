@@ -2,17 +2,27 @@ from crewai import Crew, Process
 
 from agents import YoutubeAutomationAgents
 from tasks import YoutubeAutomationTasks
-from langchain_openai import ChatOpenAI
+#from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from tools.youtube_video_details_tool import YoutubeVideoDetailsTool
 from tools.youtube_video_search_tool import YoutubeVideoSearchTool
 
 from dotenv import load_dotenv
 load_dotenv()
+import os
 
 # Initialize the OpenAI GPT-4 language model
-OpenAIGPT4 = ChatOpenAI(
-    model="gpt-4"
-)
+#OpenAIGPT4 = ChatOpenAI(
+#    model="gpt-4"
+#)
+
+## call the gemini models ###gemini-1.5-flash
+OpenAIGPT4= ChatGoogleGenerativeAI(
+    model="gemini-pro",
+    verbose=True,
+    temperature=0.5,
+    google_api_key=os.getenv("GOOGLE_API_KEY")
+    )
 
 agents = YoutubeAutomationAgents()
 tasks = YoutubeAutomationTasks()
@@ -22,7 +32,10 @@ youtube_video_details_tool = YoutubeVideoDetailsTool()
 
 youtube_manager = agents.youtube_manager()
 research_manager = agents.research_manager(
-    youtube_video_search_tool, youtube_video_details_tool)
+    youtube_video_details_tool=youtube_video_details_tool,
+    youtube_video_search_tool= youtube_video_search_tool
+    )
+    
 title_creator = agents.title_creator()
 description_creator = agents.description_creator()
 email_creator = agents.email_creator()
@@ -69,13 +82,19 @@ create_email_announcement_for_new_video = tasks.create_email_announcement_for_ne
 
 # Create a new Crew instance
 crew = Crew(
-    agents=[youtube_manager,
+    agents=[
+            youtube_manager,
             research_manager,
+            title_creator,
+            description_creator,
             email_creator,
             ],
-    tasks=[manage_youtube_video_creation,
-           manage_youtube_video_research,
-           create_email_announcement_for_new_video],
+    tasks=[
+            manage_youtube_video_creation,
+            manage_youtube_video_research,
+            create_youtube_video_title,
+            create_youtube_video_description,
+            create_email_announcement_for_new_video],
     process=Process.hierarchical,
     manager_llm=OpenAIGPT4
 )

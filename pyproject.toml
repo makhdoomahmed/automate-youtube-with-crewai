@@ -2,7 +2,7 @@
 name = "automate-youtube-with-crewai"
 version = "0.1.0"
 description = "Automate YouTube tasks with CrewAI"
-authors = ["bhancock_ai <brandon@brandonhancock.io>", "João Moura <joaomdmoura@mgail.com>"]
+authors = ["makhdoomahmed_ai <makhdoomahmed@gmail.com>", "MAKHDOOM <makhdoomahmed@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.10.0,<3.12"
